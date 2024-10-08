@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 
 export default function HerbLists(){
     const [loadStatus, setLoadStatus] = useState(true);
-    const [herbData, setHerbData] = useState(_____);
+    const [herbData, setHerbData] = useState([[]]);
 
     useEffect(()=>{
         try {
-            const _____ = _____() => {
-                const herb = _____ fetch(
-                    '_____'
+            const fetchHerbData = async() => {
+                const herb = await fetch(
+                    'http://localhost:3000/api/getHerbs'
                 );
                 if(herb.ok){
                     const hbJson = await herb.json();
-                    _____(hbJson);
+                    setHerbData(hbJson);
                 }else{
                     alert('[ERR] Unable to read data.');
                 }
@@ -25,13 +25,13 @@ export default function HerbLists(){
         }
     }, [loadStatus]);
 
-    const handleDelete = (hbId) => {
+    const handleDelete = (herbData) => {
         try {
             const fetchData = async() => {
                 const hbData = await fetch(
-                    `http://_____/${_____}`,
+                    `http://localhost:3000/api/deleteHerb/${herbData}`,
                     { 
-                        method: '_____'
+                        method: 'DELETE'
                     }
                 );
                 if(hbData.ok){
@@ -41,7 +41,7 @@ export default function HerbLists(){
                     alert('[ERR] An error when deleting data.');
                 }
             } 
-            _____();
+            fetchData();
             setLoadStatus(true);
         } catch (error) {
             alert('[ERR] An error occurs when deleting the data.');
@@ -50,22 +50,22 @@ export default function HerbLists(){
     
     return (
     <div className="m-3">
-        <a href='_____'>[ เพิ่มข้อมูลสมุนไพร ]</a>
+        <a href='/lab02/herbLists'>[ เพิ่มข้อมูลสมุนไพร ]</a>
         <h1 className="font-bold">รายการสมุนไพร</h1>
         {
             herbData.map((h_item, index) => 
             <div key={index}>
                 <div className="font-bold p-2 m-2 border-2 rounded-lg">
-                    ชื่อสมุนไพร: {_____}<br/>
-                    รายละเอียด: {_____}<br/>
-                    หมวดหมู่: {_____}<br/>
-                    สรรพคุณ: {_____}<br/>
-                    ผู้ผลิต: {_____}<br/>
+                    ชื่อสมุนไพร: {h_item.hbName}<br/>
+                    รายละเอียด: {h_item.hbDesc}<br/>
+                    หมวดหมู่: {h_item.hbCate}<br/>
+                    สรรพคุณ: {h_item.hbProp}<br/>
+                    ผู้ผลิต: {h_item.hbSupp}<br/>
                 </div>
                 <div className="p-2 m-2">
-                    <a href={`/lab02/herbDetail/${_____}`}>[ รายละเอียด ]</a>
-                    <a href={`/lab02/_____/${h_item.hbId}`}>[ แก้ไข ]</a>
-                    <a href="#" onClick={(e) => _____(`${_____}`)}>[ ลบ ]</a>
+                    <a href={`/lab02/herbDetail/${herbData}`}>[ รายละเอียด ]</a>
+                    <a href={`/lab02/herbEditForm/${h_item.herbData}`}>[ แก้ไข ]</a>
+                    <a href="#" onClick={(e) => handleDelete(`${herbData}`)}>[ ลบ ]</a>
                 </div>
             </div>
             )

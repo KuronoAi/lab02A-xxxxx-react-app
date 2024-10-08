@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import cors from 'cors';
 import admin from "firebase-admin";
 
-import serviceAccount from "_____" assert { type: "json" };
+import serviceAccount from "./config/lab02Firebase.json" with { type: "json" };
 // import serviceAccount from "_____" with { type: "json" };
 
 admin.initializeApp({
@@ -20,58 +20,58 @@ app.listen(port, ()=>{
     console.log(`Web application listening on port ${port}.`);
 });
 
-async function addHerb(_____){
-    const hbRef = db.collection('_____').doc();
-    const docRef = db.collection('_____').doc(_____);
+async function addHerb(hbId){
+    const hbRef = db.collection('Herbs').doc();
+    const docRef = db.collection('Herbs').doc(newHerbRef);
     let tmpObj = { ...tmpHbData, hbId: hbRef.id };
-    await docRef._____(tmpObj);
+    await docRef.set(tmpObj);
     console.log('Herb added.');
 }
 
 app.post('/api/addHerb', (req, res) => {
-    const { hbName, hbDesc, hbCate, hbProp, hbSupp } = req._____;
-    const tmpData = { _____, ..., _____ };
-    _____(tmpData);
+    const { hbName, hbDesc, hbCate, hbProp, hbSupp } = req.body;
+    const tmpData = { hbName, hbDesc,hbCate,hbProp, hbSupp };
+    addHerb(tmpData);
     res.status(200).json({ message: '[INFO] Add new herb successfully.' });
 })
 
-async function _____(hbId){
-    const docRef = db.collection("_____").doc(_____);
-    await docRef._____();
+async function deleteHerb(hbId){
+    const docRef = db.collection("Herbs").doc(hbId);
+    await docRef.delete();
     console.log('Herb deleted.');
 }
 
-app.delete('_____', (req, res) => {
-    const { hbId } = req._____;
-    deleteHerb(_____);
+app.delete('/api/deleteHerb:hbId', (req, res) => {
+    const { hbId } = req.params;
+    deleteHerb(hbId);
     res.status(200).json({ message: '[INFO] Deleted herb successfully.' });
 });
 
-async function _____(){
+async function fetchHerb(){
     const result = [];
-    const hbsRef = db.collection('_____');
-    const docRef = await hbsRef._____();
+    const hbsRef = db.collection('Herbs');
+    const docRef = await hbsRef.get();
     docRef.forEach(doc => {
        result.push({
         id: doc.id,
-        ..._____
+        ...doc.data()
        });
     });
-    return _____.stringify(_____);
+    return result.stringify(hbId);
 }
 
-app.get('_____', (req, res) => {
+app.get('/api/getHerbs', (req, res) => {
     res.set('Content-type', 'application/json');
     fetchHerb().then((jsonData) => {
-        res.send(_____);
+        res.send(jsonData);
     }).catch((error) => {
         res.send(error);
     });
 });
 
-async function fetchHerbById(_____){
+async function fetchHerbById(hbId){
     const result = [];
-    const hbRef = db.collection('_____')
+    const hbRef = db.collection('Herbs')
                      .where('hbId', '==', hbId);
     const docRef = await hbRef.get();
     docRef.forEach(doc => {
@@ -83,24 +83,24 @@ async function fetchHerbById(_____){
     return result;
 }
 
-app.get('_____', (req, res) => {
+app.get('/api/getHerb', (req, res) => {
     const { hbId } = req.params;
     res.set('Content-type', 'application/json');
-    _____(hbId).then((_____) => {
+    fetchHerb(hbId).then((jsonData) => {
         res.send(jsonData[0]);
     }).catch((error) => {
         res.send(error);
     });
 });
 
-async function _____(hbId, hbData){
-    const docRef = db.collection('_____').doc(_____);
-    await docRef._____(_____);
+async function updateHerb(hbId, hbData){
+    const docRef = db.collection('Herbs').doc(hbId);
+    await docRef.update(hbData);
     console.log('Herb updated!');
 }
 
-app.post('_____', (req, res) => {
-    const { hbId, _____, ..., _____ } = req.body;
-    updateHerb(_____, { hbName, hbDesc, hbCate, hbProp, hbSupp });
+app.post('/api/updateHerb', (req, res) => {
+    const { hbId, hbName, hbDesc, hbCate, hbProp, hbSupp } = req.body;
+    updateHerb(hbId, { hbName, hbDesc, hbCate, hbProp, hbSupp });
     res.status(200).json({ message: '[INFO] Herb updated successfully.'});
 });

@@ -1,27 +1,33 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "@remix-run/react";
+import Index from "./_index";
 
 export default function HerbDetail(){
     const myParams = useParams();
-    const hbId = _____.hbId;
+    const hbId = myParams.hbId;
     const [hbData, setHerbData] = useState({
-        _____
+        hbId: '', 
+        hbName: '', 
+        hbDesc: '', 
+        hbCate: 0, 
+        hbProp: '', 
+        hbSupp: '',
     });
 
     useEffect(() => {
         try {
             const fetchHerbData = async () => {
-                const hbData = await fetch(`_____/${_____}`);
+                const hbData = await fetch(`http://localhost:3000/api/getHerbs//${hbId}`);
                 if (hbData.ok) {
                     const hbJson = await hbData.json();
-                    _____(hbJson);
+                    setHerbData(hbJson);
                     console.log(hbJson);
                 } else {
                     alert('[ERR] Failed to loaded data.');
                 }
             }
 
-            _____().catch(console.error);
+            fetchHerbData().catch(console.error);
         } catch (error) {
             alert('[ERR] An error occurred while loading the data.');
         }
@@ -29,16 +35,16 @@ export default function HerbDetail(){
 
     return (
     <div className="m-3">
-        <a href='_____'>[ ข้อมูลสมุนไพร ]</a>
+        <a href='/lab02/herbLists'>[ ข้อมูลสมุนไพร ]</a>
         <h1 className="font-bold">รายละเอียดสมุนไพร</h1>
         {
-            <div key={_____}>
+            <div key={hbId}>
                 <div className="font-bold p-2 m-2 border-2 rounded-lg">
-                    ชื่อสมุนไพร: {_____}<br/>
-                    รายละเอียด: {_____}<br/>
-                    หมวดหมู่: {_____}<br/>
-                    สรรพคุณ: {_____}<br/>
-                    ผู้ผลิต: {_____}<br/>
+                    ชื่อสมุนไพร: {hbData.hbName}<br/>
+                    รายละเอียด: {hbData.hbDesc}<br/>
+                    หมวดหมู่: {hbData.hbCate}<br/>
+                    สรรพคุณ: {hbData.hbProp}<br/>
+                    ผู้ผลิต: {hbData.hbSupp}<br/>
                 </div>
             </div>
         }
